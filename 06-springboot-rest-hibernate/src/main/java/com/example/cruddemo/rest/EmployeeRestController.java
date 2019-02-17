@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.cruddemo.entity.Employee;
+import com.example.cruddemo.exception.EmployeeNotFoundException;
 import com.example.cruddemo.service.EmployeeService;
 
 @RestController
@@ -35,8 +36,7 @@ public class EmployeeRestController {
     public Employee getEmployee(@PathVariable int employeeId) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         if (employee == null) {
-            // TODO: throw a custom exception with error response
-            throw new RuntimeException("Employee id not found - " + employeeId);
+            throw new EmployeeNotFoundException("Employee id not found - " + employeeId);
         }
         return employeeService.getEmployeeById(employeeId);
     }
@@ -50,7 +50,22 @@ public class EmployeeRestController {
 
     @PutMapping("/employees")
     public Employee updateEmployee(@RequestBody Employee employee) {
-        // TODO: check whether the employee exists or not. Throw an exception, if not
+        /**
+         * With try catch block:
+         * Global exception will catch the exception by Spring,
+         * before we could catch a rethrow our own custom exception
+         */
+        /*try {
+            employeeService.saveEmployee(employee);
+        } catch (StaleObjectStateException e) {
+            throw new EmployeeNotFoundException("Employee id not found - " + employee.getId());
+        }*/
+
+
+        Employee employeeDB = employeeService.getEmployeeById(employee.getId());
+        if (employeeDB == null) {
+            throw new EmployeeNotFoundException("Employee id not found - " + employee.getId());
+        }
         employeeService.saveEmployee(employee);
         return employee;
     }
@@ -59,8 +74,7 @@ public class EmployeeRestController {
     public String deleteEmployee(@PathVariable int employeeId) {
         Employee employee = employeeService.getEmployeeById(employeeId);
         if (employee == null) {
-            // TODO: throw a custom exception with error response
-            throw new RuntimeException("Employee id not found - " + employeeId);
+            throw new EmployeeNotFoundException("Employee id not found - " + employeeId);
         }
         employeeService.deleteEmployeeById(employeeId);
         return "Deleted employee id - " + employeeId;
