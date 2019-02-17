@@ -1,28 +1,30 @@
 package com.example.cruddemo.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.cruddemo.dao.EmployeeRepository;
 import com.example.cruddemo.entity.Employee;
+import com.example.cruddemo.exception.EmployeeNotFoundException;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private EmployeeDAO employeeDAO;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
-    public EmployeeServiceImpl(@Qualifier("employeeDAOJpaImpl") EmployeeDAO employeeDAO) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
     @Transactional
     public List<Employee> getAllEmployees() {
-        return employeeDAO.findAllEmployees();
+        return employeeRepository.findAll();
     }
 
     @Override
@@ -34,12 +36,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public void saveEmployee(Employee employee) {
-        employeeDAO.saveEmployee(employee);
+        employeeRepository.save(employee);
     }
 
     @Override
     @Transactional
     public void deleteEmployeeById(int id) {
-        employeeDAO.deleteEmployeeById(id);
+        employeeRepository.deleteById(id);
     }
 }
