@@ -30,7 +30,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public Employee getEmployeeById(int id) {
-        return employeeDAO.findEmployeeById(id);
+        Optional<Employee> result = employeeRepository.findById(id);
+
+        Employee employee;
+        if (result.isPresent()) {
+            employee = result.get();
+        } else {
+            throw new EmployeeNotFoundException("Employee not found for id - " + id);
+        }
+        return employee;
     }
 
     @Override
